@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -15,6 +16,7 @@ API_MODEL = "llama3"
 
 chrome_options = Options()
 chrome_options.add_argument("--user-data-dir=./chrome-data")
+chrome_options.add_argument("--remote-debugging-port=9222") # overcome limited resource problems
 
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
