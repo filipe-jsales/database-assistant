@@ -1,3 +1,4 @@
 chrome-data/*
 /chrome-data/*
 whatsapp_session.pkl
+__pycache__/
