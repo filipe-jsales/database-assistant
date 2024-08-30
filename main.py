@@ -3,7 +3,7 @@ from lib.initialization.session import init as session_initialization
 from lib.initialization.audio import init as audio_initialization
 from lib.initialization.driver import init as driver_initialization
 
-use_audio = True
+use_audio = False
 
 driver = driver_initialization()
 session_initialization(driver)
