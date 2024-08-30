@@ -1,68 +1,82 @@
 # WhatsApp Automation Bot
 
-This project is a WhatsApp automation bot that uses Selenium to interact with WhatsApp Web. It can send messages, respond to commands, and interact with an external API to generate responses based on specific prompts.
+Este projeto é um bot de automação do WhatsApp que utiliza Selenium para interagir com o WhatsApp Web. Ele pode enviar mensagens, responder a comandos e interagir com uma API externa para gerar respostas com base em prompts específicos.
 
-## Features
+## Funcionalidades
 
-- **Session Management**: Saves and loads WhatsApp Web sessions to avoid repeated QR code scans.
-- **Automated Messaging**: Sends messages to a specific group.
-- **Custom Commands**: Responds to custom commands like `!duta` and `!everyone`.
-- **Content Filtering**: Filters out banned words and responds accordingly.
-- **API Integration**: Uses an external API to generate responses based on user prompts.
-- **Audio Recording**: Records and sends audio messages in the group.
+- **Gerenciamento de Sessão**: Salva e carrega sessões do WhatsApp Web para evitar a necessidade de escanear o QR code repetidamente.
+- **Mensagens Automáticas**: Envia mensagens para um grupo específico.
+- **Comandos Personalizados**: Responde a comandos personalizados como `!duta` e `!everyone`.
+- **Filtragem de Conteúdo**: Filtra palavras proibidas e responde de acordo.
+- **Integração com API**: Utiliza uma API externa para gerar respostas com base em prompts dos usuários.
+- **Gravação de Áudio**: Grava e envia mensagens de áudio no grupo.
 
-## Installation
+## Instalação
 
-### Prerequisites
+### Pré-requisitos
 
 - Python 3.7+
 - Google Chrome
-- ChromeDriver (managed automatically by `webdriver-manager`)
+- ChromeDriver (gerenciado automaticamente pelo `webdriver-manager`)
 
-### Setup
+### Configuração
 
-1. Clone the repository:
+1. Clone o repositório:
     ```bash
     git clone https://github.com/yourusername/whatsapp-automation-bot.git
     cd whatsapp-automation-bot
     ```
 
-2. Install the required Python packages:
+2. Crie e ative o ambiente virtual:
+
+    **No Linux/MacOS:**
+    ```bash
+    python3 -m venv duta
+    source duta/bin/activate
+    ```
+
+    **No Windows:**
+    ```bash
+    python -m venv duta
+    duta\Scripts\activate
+    ```
+
+3. Instale os pacotes Python necessários:
     ```bash
     pip install -r requirements.txt
     ```
 
-3. Run the bot:
+4. Execute o bot:
     ```bash
     python bot.py
     ```
 
-## Configuration
+## Configuração
 
-- **Group Name**: Update the `group_name` variable in the script with the name of the WhatsApp group you want to interact with.
-- **API Integration**: The script is set up to interact with an API at `https://ollama.chargedcloud.com.br/api/chat` using the `llama3` model. You can modify the `API_URL` and `API_MODEL` variables as needed.
+- **Nome do Grupo**: Atualize a variável `group_name` no script com o nome do grupo do WhatsApp com o qual deseja interagir.
+- **Integração com API**: O script está configurado para interagir com uma API em `https://ollama.chargedcloud.com.br/api/chat` usando o modelo `llama3`. Você pode modificar as variáveis `API_URL` e `API_MODEL` conforme necessário.
 
-## Usage
+## Uso
 
-### Starting the Bot
+### Iniciando o Bot
 
-Run the script and scan the QR code on WhatsApp Web. The bot will start monitoring the group for new messages.
+Execute o script e escaneie o QR code no WhatsApp Web. O bot começará a monitorar o grupo para novas mensagens.
 
-### Commands
+### Comandos
 
-- **`!duta <message>`**: Sends a prompt to the API and returns a response.
-- **`!everyone`**: Mentions all group members.
-- **Banned Words**: If a message contains a banned word, the bot will send a warning message.
-- **Bot Detection**: If a message contains words like "bot", the bot will respond rudely as per the instructions.
+- **`!duta <mensagem>`**: Envia um prompt para a API e retorna uma resposta.
+- **`!everyone`**: Menciona todos os membros do grupo.
+- **Palavras Proibidas**: Se uma mensagem contiver uma palavra proibida, o bot enviará uma mensagem de aviso.
+- **Detecção de Bot**: Se uma mensagem contiver palavras como "bot", o bot responderá de forma rude conforme as instruções.
 
-## Session Management
+## Gerenciamento de Sessão
 
-The bot saves the WhatsApp session in a `whatsapp_session.pkl` file. This file allows the bot to resume the session without needing to scan the QR code again.
+O bot salva a sessão do WhatsApp em um arquivo `whatsapp_session.pkl`. Este arquivo permite que o bot retome a sessão sem precisar escanear o QR code novamente.
 
-## Contributing
+## Contribuindo
 
-Feel free to open issues or submit pull requests if you want to contribute to this project.
+Sinta-se à vontade para abrir issues ou enviar pull requests se quiser contribuir para este projeto.
 
-## License
+## Licença
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Este projeto é licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para mais detalhes.
