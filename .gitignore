@@ -3,3 +3,4 @@ chrome-data/*
 whatsapp_session.pkl
 __pycache__/
 .vscode/
+/duta/

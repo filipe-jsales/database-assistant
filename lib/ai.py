@@ -1,7 +1,11 @@
+import os
 import requests
+from dotenv import load_dotenv
 
-API_URL = "https://ollama.chargedcloud.com.br/api/chat"
-API_MODEL = "llama3"
+load_dotenv()
+
+API_URL = os.getenv("API_URL")
+API_MODEL = os.getenv("API_MODEL")
 
 def get_api_response(prompt):
     headers = {"Content-Type": "application/json"}
