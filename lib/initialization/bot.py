@@ -12,7 +12,7 @@ from lib.interaction.message import extract_message_text, extract_sender, get_me
 
 message_history = []
 
-def init(start_message, group_name, driver, engine, use_audio):
+def init(start_message, group_name, rvc, driver, engine, use_audio):
     send_message_to_group(driver, group_name, start_message)
     global message_history
     last_message_text = ""
@@ -55,7 +55,7 @@ def init(start_message, group_name, driver, engine, use_audio):
                             choice = random.randint(1, 100)
                             print("random: " + str(choice))
                             if choice <= 20:
-                                record_and_send_audio(driver, engine, group_name, response)
+                                record_and_send_audio(rvc, driver, engine, group_name, response)
                             else:
                                 send_message_to_group(driver, group_name, response)
                         else:
@@ -65,7 +65,7 @@ def init(start_message, group_name, driver, engine, use_audio):
                     send_mentions_one_by_one(driver, group_name)
 
                 elif any(banned_word in last_message.lower() for banned_word in banned_words):
-                    send_message_to_group(group_name, "opa irmão, sem palavrão aí paizão, grupo da família aqui")
+                    send_message_to_group(driver, group_name, "opa irmão, sem palavrão aí paizão, grupo da família aqui")
 
                 elif any(bot_word in last_message.lower() for bot_word in bot_words):
                     prompt = "me diga que você não é um bot, de forma rude e usando palavrão em 1/5 das vezes"
@@ -73,7 +73,7 @@ def init(start_message, group_name, driver, engine, use_audio):
                     send_message_to_group(driver, group_name, response)
 
                 elif last_message.startswith("!audio") and use_audio:
-                    record_and_send_audio(driver, engine, group_name, "Audio teste")
+                    record_and_send_audio(rvc, driver, engine, group_name, "Audio teste")
 
         except Exception as e:
             print(f"Erro: {str(e)}")
