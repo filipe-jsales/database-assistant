@@ -1,13 +1,19 @@
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-import time
 import os
 import pickle
+import random
+import time
+
+import pyttsx3
 import requests
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from webdriver_manager.chrome import ChromeDriverManager
+from pygame import mixer, _sdl2 as devices
+
+from audio import record_and_send_audio
 from context import member_contexts, banned_words, bot_words, group_members, pingar_todos
 
 SESSION_FILE = "whatsapp_session.pkl"
@@ -19,6 +25,12 @@ chrome_options.add_argument("--user-data-dir=./chrome-data")
 chrome_options.add_argument("--remote-debugging-port=9222")
 
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+engine = pyttsx3.init()
+mixer.init()
+print("Outputs:", devices.audio.get_audio_device_names(False))
+mixer.quit()
+
+mixer.init(devicename = "Bot (VB-Audio Virtual Cable)")
 
 def load_session(driver):
     if os.path.exists(SESSION_FILE):
@@ -78,6 +90,13 @@ def extract_message_text(message_element):
     except:
         return message_element.text
 
+def extract_sender(message_element):
+    try:
+        text_element = message_element.find_element(By.CSS_SELECTOR, 'span[dir="auto"]')
+        return get_member_name_from_message(text_element.text)
+    except:
+        return message_element.text
+
 def get_member_name_from_message(message):
     for member in group_members:
         if member.lower() in message.lower():
@@ -111,25 +130,30 @@ def check_for_new_messages(group_name):
             messages = driver.find_elements(By.XPATH, '//div[contains(@class, "message-in")]')
             last_message_element = messages[-1]
             last_message = extract_message_text(last_message_element)
-            
+            sender_name = extract_sender(last_message_element)
+
             if last_message != last_message_text and last_message.strip():
-                print(f"Última mensagem: {last_message}")
+                print(f"Última mensagem: {sender_name} - {last_message}")
                 last_message_text = last_message 
 
                 message_history.append(last_message)
                 if len(message_history) > 15:
                     message_history.pop(0)
-                
+
                 if last_message.startswith("!duta"):
                     user_message = last_message.replace("!duta", "").strip()
 
                     member_name = get_member_name_from_message(user_message)
                     context = member_contexts.get(member_name, "")
-                    
+
                     if user_message:
                         full_prompt = f"{context} {user_message}"
                         response = get_api_response(full_prompt)
-                        send_message_to_group(group_name, response)
+                        choice = random.randint(1, 2)
+                        if choice == 1 or choice == 2:
+                            record_and_send_audio(driver, engine, group_name, response)
+                        else:
+                            send_message_to_group(group_name, response)
                 
                 elif last_message.startswith("!everyone"):
                     send_mentions_one_by_one(group_name)
@@ -141,27 +165,15 @@ def check_for_new_messages(group_name):
                     prompt = "me diga que você não é um bot, de forma rude e usando palavrão em 1/5 das vezes"
                     response = get_api_response(prompt)
                     send_message_to_group(group_name, response)
-                    
+
+                elif last_message.startswith("!audio"):
+                    record_and_send_audio(driver, engine, group_name, "Audio teste")
+
         except Exception as e:
             print(f"Erro: {str(e)}")
         time.sleep(5)
 
-def record_and_send_audio(group_name):
-    search_box = driver.find_element(By.XPATH, '//div[@contenteditable="true"][@data-tab="3"]')
-    search_box.clear()
-    search_box.send_keys(group_name + Keys.ENTER)
-    time.sleep(2)
-    search_box.send_keys(group_name + Keys.ENTER)
-
-    record_button = driver.find_element(By.XPATH, '//span[@data-icon="ptt"]')
-    record_button.click()
-    
-    time.sleep(5)
-
-    send_button = driver.find_element(By.XPATH, '//span[@data-icon="send"]')
-    send_button.click()
-
 group_name = "Pubzinho Season 7"
-send_message_to_group(group_name, "oiiii primos")
+send_message_to_group(group_name, "fala")
 
 check_for_new_messages(group_name)
