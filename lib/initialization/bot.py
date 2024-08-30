@@ -12,8 +12,8 @@ from lib.interaction.message import extract_message_text, extract_sender, get_me
 
 message_history = []
 
-def init(group_name, driver, engine, use_audio):
-    send_message_to_group(driver, group_name, "fala")
+def init(start_message, group_name, driver, engine, use_audio):
+    send_message_to_group(driver, group_name, start_message)
     global message_history
     last_message_text = ""
     search_box = driver.find_element(By.XPATH, '//div[@contenteditable="true"][@data-tab="3"]')
