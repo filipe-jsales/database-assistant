@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -9,6 +8,7 @@ import time
 import os
 import pickle
 import requests
+from context import member_contexts, banned_words, bot_words, group_members, pingar_todos
 
 SESSION_FILE = "whatsapp_session.pkl"
 API_URL = "https://ollama.chargedcloud.com.br/api/chat"
@@ -16,7 +16,7 @@ API_MODEL = "llama3"
 
 chrome_options = Options()
 chrome_options.add_argument("--user-data-dir=./chrome-data")
-chrome_options.add_argument("--remote-debugging-port=9222") # overcome limited resource problems
+chrome_options.add_argument("--remote-debugging-port=9222")
 
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
@@ -53,20 +53,10 @@ def send_message_to_group(group_name, message):
 
 def get_api_response(prompt):
     headers = {"Content-Type": "application/json"}
-    
-    # Instruções claras sobre como o modelo deve responder
-    instructions = (
-        "Você é um jovem informal e direto. use as vezes 40 porcento das vezes a gíria 'mano' e seja "
-        "informal, sem utilizar 'você', use 'tu'. Textos sempre no minúsculo e "
-        "sem pontuações ou acentuações como exclamação, vírgula ou ponto final. "
-        "você é assume a personalidade de um homem machista, homofóbico e racista. "
-        "Responda com no máximo 40 caracteres. Se receber uma pergunta, tenha 20% "
-        "de chance de responder de forma negativa ou dizendo que não sabe, de forma "
-        "direta e com poucas palavras, por exemplo: 'sei não cara', 'sei n mano'. "
-        "Pergunta: "
-    )
-    
-    # Cria a mensagem com instrução e o prompt
+
+    with open('instructions.txt', 'r', encoding='utf-8') as file:
+        instructions = file.read()
+
     messages = [
         {"role": "user", "content": instructions + prompt}
     ]
@@ -88,14 +78,6 @@ def extract_message_text(message_element):
     except:
         return message_element.text
 
-banned_words = ["crl", "caralho", "porra", "vsf", "filha da puta", "fdp"]
-
-bot_words = ["bot"]
-
-group_members = ["pedro", "marina", "joao", "joão", "marcelo", "leo", "ulisses"]
-
-pingar_todos = ["@pedro", "@star", "@jo", "@leo", "@ulisses"]
-
 def get_member_name_from_message(message):
     for member in group_members:
         if member.lower() in message.lower():
@@ -114,22 +96,18 @@ def send_mentions_one_by_one(group_name):
     for mention in pingar_todos:
         message_box = driver.find_element(By.XPATH, '//div[@contenteditable="true"][@data-tab="10"]')
         message_box.clear()
-        message_box.send_keys(mention + Keys.ENTER)  # Envia a menção
-        message_box.send_keys(Keys.ENTER)  # Pressiona Enter uma segunda vez para garantir o envio
-        time.sleep(1)  # Adiciona um pequeno atraso entre as menções para evitar sobrecarregar a interface
-
-
+        message_box.send_keys(mention + Keys.ENTER)
+        message_box.send_keys(Keys.ENTER)
+        time.sleep(1)
 
 def check_for_new_messages(group_name):
     global message_history
     last_message_text = ""  
+    search_box = driver.find_element(By.XPATH, '//div[@contenteditable="true"][@data-tab="3"]')
+    search_box.send_keys(group_name + Keys.ENTER)
+    search_box.clear()
     while True:
         try:
-            search_box = driver.find_element(By.XPATH, '//div[@contenteditable="true"][@data-tab="3"]')
-            search_box.clear()
-            search_box.send_keys(group_name + Keys.ENTER)
-            time.sleep(2)
-            
             messages = driver.find_elements(By.XPATH, '//div[contains(@class, "message-in")]')
             last_message_element = messages[-1]
             last_message = extract_message_text(last_message_element)
@@ -138,16 +116,19 @@ def check_for_new_messages(group_name):
                 print(f"Última mensagem: {last_message}")
                 last_message_text = last_message 
 
-                # Adiciona a última mensagem ao histórico
                 message_history.append(last_message)
-                if len(message_history) > 10:
-                    message_history.pop(0)  # Mantém um histórico de 10 mensagens
+                if len(message_history) > 15:
+                    message_history.pop(0)
                 
-                # Ajuste o comportamento com base no histórico
                 if last_message.startswith("!duta"):
                     user_message = last_message.replace("!duta", "").strip()
+
+                    member_name = get_member_name_from_message(user_message)
+                    context = member_contexts.get(member_name, "")
+                    
                     if user_message:
-                        response = get_api_response(user_message)
+                        full_prompt = f"{context} {user_message}"
+                        response = get_api_response(full_prompt)
                         send_message_to_group(group_name, response)
                 
                 elif last_message.startswith("!everyone"):
@@ -157,7 +138,7 @@ def check_for_new_messages(group_name):
                     send_message_to_group(group_name, "opa irmão, sem palavrão aí paizão, grupo da família aqui")
                     
                 elif any(bot_word in last_message.lower() for bot_word in bot_words):
-                    prompt = "me diga que você não é um bot, de forma rude e podendo usar palavrão"
+                    prompt = "me diga que você não é um bot, de forma rude e usando palavrão em 1/5 das vezes"
                     response = get_api_response(prompt)
                     send_message_to_group(group_name, response)
                     
@@ -165,14 +146,12 @@ def check_for_new_messages(group_name):
             print(f"Erro: {str(e)}")
         time.sleep(5)
 
-
 def record_and_send_audio(group_name):
     search_box = driver.find_element(By.XPATH, '//div[@contenteditable="true"][@data-tab="3"]')
     search_box.clear()
     search_box.send_keys(group_name + Keys.ENTER)
     time.sleep(2)
     search_box.send_keys(group_name + Keys.ENTER)
-
 
     record_button = driver.find_element(By.XPATH, '//span[@data-icon="ptt"]')
     record_button.click()
@@ -183,6 +162,6 @@ def record_and_send_audio(group_name):
     send_button.click()
 
 group_name = "Pubzinho Season 7"
-send_message_to_group(group_name, "fala")
+send_message_to_group(group_name, "oiiii primos")
 
 check_for_new_messages(group_name)
