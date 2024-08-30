@@ -12,8 +12,10 @@ from lib.interaction.message import extract_message_text, extract_sender, get_me
 
 message_history = []
 
-def init(start_message, group_name, rvc, driver, engine, use_audio):
-    send_message_to_group(driver, group_name, start_message)
+def init(start_message, group_name, rvc, driver, engine, use_audio, response_prefix=""):
+    if len(response_prefix) > 0:
+        response_prefix += " "
+    send_message_to_group(driver, group_name, response_prefix + start_message)
     global message_history
     last_message_text = ""
     search_box = driver.find_element(By.XPATH, '//div[@contenteditable="true"][@data-tab="3"]')
@@ -55,11 +57,11 @@ def init(start_message, group_name, rvc, driver, engine, use_audio):
                             choice = random.randint(1, 100)
                             print("random: " + str(choice))
                             if choice <= 20:
-                                record_and_send_audio(rvc, driver, engine, group_name, response)
+                                record_and_send_audio(rvc, driver, engine, group_name, response_prefix + response)
                             else:
-                                send_message_to_group(driver, group_name, response)
+                                send_message_to_group(driver, group_name, response_prefix + response)
                         else:
-                            send_message_to_group(driver, group_name, response)
+                            send_message_to_group(driver, group_name, response_prefix + response)
 
                 elif last_message.startswith("!everyone"):
                     send_mentions_one_by_one(driver, group_name)
