@@ -17,7 +17,7 @@ def record_and_send_audio(rvc, driver, engine, group_name, response):
     search_box.send_keys(group_name + Keys.ENTER)
     record_button = driver.find_element(By.XPATH, '//span[@data-icon="ptt"]')
 
-    retry_with_backoff(play, rvc, engine, response, record_button)
+    play(rvc, engine, response, record_button)
 
     send_button = driver.find_element(By.CSS_SELECTOR, 'button[aria-label="Enviar"]')
     send_button.click()
@@ -46,17 +46,3 @@ def play(rvc, engine, message, record_button):
         time.sleep(1)
     mixer.music.unload()
     rvc.unload_model()
-
-def retry_with_backoff(func, *args):
-    attempt = 1
-    max_attempts = 5
-    while attempt <= max_attempts:
-        try:
-            func(*args)
-            return
-        except Exception as e:
-            error_message = str(e)
-            print(f"Attempt {attempt} failed with error: {e}")
-            if attempt == max_attempts or not error_message.startswith("RuntimeError: The size of tensor a"):
-                raise AssertionError(f"Max attempts reached: {e}")
-            attempt += 1
