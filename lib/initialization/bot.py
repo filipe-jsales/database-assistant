@@ -30,10 +30,6 @@ def init(start_message, group_name, driver, engine, use_audio):
                 print(f"Última mensagem: {sender_name} - {last_message}")
                 last_message_text = last_message
 
-                message_history.append(last_message)
-                if len(message_history) > 15:
-                    message_history.pop(0)
-
                 if last_message.startswith("!duta"):
                     user_message = last_message.replace("!duta", "").strip()
 
@@ -41,9 +37,20 @@ def init(start_message, group_name, driver, engine, use_audio):
                     context = member_contexts.get(member_name, "")
 
                     if user_message:
-                        full_prompt = f"{context} {user_message}"
+                        full_prompt = ''
+                        # TODO: append de todo o histórico de mensagems
+                        for message in message_history:
+                            full_prompt += " Leve em consideração que uma das mensagens anteriores foi: " + message
+                        full_prompt += f"Pergunta: {context} {user_message}"
                         response = get_api_response(full_prompt)
                         print(response)
+                        # TODO: melhorar histórico de mensagems
+                        message_history.append(user_message)
+                        if len(message_history) > 15:
+                            message_history.pop(0)
+                        message_history.append(response)
+                        if len(message_history) > 15:
+                            message_history.pop(0)
                         if use_audio:
                             choice = random.randint(1, 100)
                             print("random: " + str(choice))
