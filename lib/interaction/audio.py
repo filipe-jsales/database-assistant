@@ -13,8 +13,7 @@ def record_and_send_audio(driver, engine, group_name, response):
 
     record_button = driver.find_element(By.XPATH, '//span[@data-icon="ptt"]')
     record_button.click()
-    time.sleep(1)
-    print(response)
+    time.sleep(2)
     play(engine, response)
 
     send_button = driver.find_element(By.CSS_SELECTOR, 'button[aria-label="Enviar"]')
@@ -22,10 +21,10 @@ def record_and_send_audio(driver, engine, group_name, response):
 
 
 def play(engine, message):
-    engine.save_to_file(message, "speech.wav")
+    engine.save_to_file(message, "../../speech.wav")
     engine.runAndWait()
 
-    mixer.music.load("speech.wav")
+    mixer.music.load("../../speech.wav")
     mixer.music.play()
 
     while mixer.music.get_busy():
