@@ -3,3 +3,4 @@ webdriver-manager==4.0.2
 requests==2.31.0
 pyttsx3==2.91
 pygame~=2.6.0
+chromadb==0.5.0

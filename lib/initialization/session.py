@@ -1,8 +1,11 @@
 import os
 import pickle
 import time
+from dotenv import load_dotenv
 
-SESSION_FILE = "whatsapp_session.pkl"
+load_dotenv()
+
+SESSION_FILE = os.getenv("SESSION_FILE", "whatsapp_session.pkl")
 
 def init(driver):
     if os.path.exists(SESSION_FILE):
