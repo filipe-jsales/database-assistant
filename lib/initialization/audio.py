@@ -1,12 +1,22 @@
-import pyttsx3
+import os
+try:
+    import pyttsx3
+    from rvc_python.infer import RVCInference
+    from pygame import mixer
+except ImportError:
+    print("Bibliotecas de áudio não instaladas.")
 
-from pygame import mixer, _sdl2 as devices
 
-def init(use_audio):
-    if use_audio:
-        mixer.init()
-        print("Outputs:", devices.audio.get_audio_device_names(False))
-        mixer.quit()
+from dotenv import load_dotenv
 
-        mixer.init(devicename="Bot (VB-Audio Virtual Cable)")
-        return pyttsx3.init()
+load_dotenv()
+
+def init_pyttsx3():
+    mixer.init(devicename=os.getenv("WINDOWS_AUDIO_VIRTUAL_MIC_NAME"))
+    return pyttsx3.init()
+
+def init_rvc():
+    directory = os.getcwd() + os.getenv("AI_MODEL_DIRECTORY_PATH")
+    rvc = RVCInference(device="cuda:0")
+    rvc.set_models_dir(directory)
+    return rvc

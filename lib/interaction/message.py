@@ -3,7 +3,7 @@ import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
-from context import member_contexts, banned_words, bot_words, group_members, pingar_todos
+from context import member_contexts, banned_words, bot_words, pingar_todos
 
 
 def send_message_to_group(driver, group_name, message):
@@ -45,7 +45,7 @@ def extract_sender(message_element):
     except:
         return message_element.text
 
-def get_member_name_from_message(message):
+def get_member_name_from_message(message, group_members):
     for member in group_members:
         if member.lower() in message.lower():
             return member
