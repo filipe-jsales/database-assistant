@@ -44,7 +44,7 @@ def init(start_message, group_name, rvc, driver, engine, use_audio, response_pre
                     handle_duta_command(driver, engine, group_members, group_name, last_message, response_prefix, rvc,
                                         sender_name, use_audio)
 
-                elif last_message.startswith("!bora"):
+                elif last_message.startswith("!everyone"):
                     send_mentions_one_by_one(driver, group_name, group_members)
 
                 elif any(banned_word in last_message.lower() for banned_word in banned_words):
