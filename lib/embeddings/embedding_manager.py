@@ -38,11 +38,7 @@ def list_documents():
 def store_embeddings(texts):
     embeddings = generate_embeddings(texts)
 
-    print(f"Generated {len(embeddings)} embeddings.")
-    print('texts:', texts)
-    
     ids = [str(uuid.uuid4()) for _ in range(len(embeddings))]
-    print('ids:', ids)
     
     if len(embeddings) != len(ids):
         raise ValueError(f"Number of embeddings {len(embeddings)} must match number of ids {len(ids)}")
@@ -54,16 +50,14 @@ def store_embeddings(texts):
         for text in texts:
             file.write(text + '\n')
 
-    print(f"Inserted {len(texts)} embeddings into FAISS index.")
-
-def get_relevant_context(query_embedding, top_k=5):
+def get_relevant_context(query_embedding, top_k=10):
     query_np = np.array([query_embedding]).astype('float32')
     
     distances, indices = index.search(query_np, k=top_k)
     
     all_texts = list_documents()
     results = [all_texts[i] for i in indices[0] if i < len(all_texts)]
-    print('results:', results)
+    print('relevant context:', results)
     return results
 
 def add_message_to_context(message):

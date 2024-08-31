@@ -74,14 +74,13 @@ def init(start_message, group_name, rvc, driver, engine, use_audio, response_pre
                     full_prompt = '\n'.join(relevant_contexts) + f"\nMensagem do usuário: {context} {user_message}"
 
                     response = get_api_response(full_prompt)
-                    print(response)
+                    print('response full prompt:', response)
 
-                    add_message_to_context(user_message)
                     add_message_to_context(response)
                     if user_message:
                         if use_audio:
                             choice = random.randint(1, 100)
-                                if choice <= 20:
+                            if choice <= 20:
                                 record_and_send_audio(rvc, driver, engine, group_name, response_prefix + response)
                             else:
                                 send_message_to_group(driver, group_name, response_prefix + response)
