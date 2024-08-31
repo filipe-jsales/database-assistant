@@ -10,6 +10,6 @@ banned_words = ["crl", "caralho", "porra", "vsf", "filha da puta", "fdp"]
 
 bot_words = ["bot", "robô", "robo", "maquina"]
 
-group_members = ["pedro", "marina", "joao", "joão", "marcelo", "leo", "ulisses", "ulisses c", "filipe", "pedro v" "prima lua"]
+group_members = ["pedro", "marina", "joao", "joão", "marcelo", "leo", "ulisses", "ulisses c", "filipe", "pedro v" "prima lua", "filipe", "edu"]
 
 pingar_todos = ["@pedro", "@star", "@jo", "@leo", "@ulisses"]
