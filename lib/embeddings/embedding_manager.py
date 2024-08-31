@@ -1,17 +1,17 @@
 import os
 import requests
-import chromadb
-from chromadb.config import Settings
-from dotenv import load_dotenv
+import faiss
+import numpy as np
 import uuid
+from dotenv import load_dotenv
 
 load_dotenv()
 
-# client = chromadb.peClient()
+embedding_dimension = 4096 
+index = faiss.IndexFlatL2(embedding_dimension)
 
-client = chromadb.PersistentClient(path="./chroma_db")
-collection_name = "message_embeddings"
-collection = client.get_or_create_collection(collection_name)
+context_file_path = 'context.txt'
+
 def generate_embeddings(texts, model="llama3"):
     url = os.getenv("API_EMBEDDING_URL", "https://ollama.chargedcloud.com.br/api/embed")
     data = {
@@ -22,44 +22,47 @@ def generate_embeddings(texts, model="llama3"):
     
     response = requests.post(url, json=data)
     response.raise_for_status()
+    print('response for generate embeddings:', response)
     return response.json().get("embeddings", [])
 
-def list_documents(collection_name="message_embeddings"):
-    documents = collection.get()
-    
-    return documents
+def list_documents():
+    if os.path.exists(context_file_path):
+        with open(context_file_path, 'r') as file:
+            lines = file.readlines()
+        return [line.strip() for line in lines]
+    else:
+        return []
 
-def store_embeddings(texts, collection_name="message_embeddings"):
-    collection = client.get_or_create_collection(name=collection_name)
+def store_embeddings(texts):
     embeddings = generate_embeddings(texts)
 
     print(f"Generated {len(embeddings)} embeddings.")
-    print('texts', texts)
+    print('texts:', texts)
     
     ids = [str(uuid.uuid4()) for _ in range(len(embeddings))]
-    print(ids)
+    print('ids:', ids)
     
     if len(embeddings) != len(ids):
         raise ValueError(f"Number of embeddings {len(embeddings)} must match number of ids {len(ids)}")
 
-    collection.add(documents=texts, embeddings=embeddings, ids=ids)
+    embeddings_np = np.array(embeddings).astype('float32')
+    index.add(embeddings_np)
 
-    print(f"Inserted {len(texts)} embeddings into collection '{collection_name}'.")
+    with open(context_file_path, 'a') as file:
+        for text in texts:
+            file.write(text + '\n')
 
-
-# def query_context(query_texts, collection_name="message_embeddings", n_results=2):
-#     results = collection.query(
-#         query_texts=query_texts,
-#         n_results=n_results
-#     )
-#     print('query', query_texts)
-#     return results
-
+    print(f"Inserted {len(texts)} embeddings into FAISS index.")
 
 def get_relevant_context(query_embedding, top_k=5):
-    results = collection.query(query_embedding, top_k=top_k)
-    return [res["metadata"] for res in results]
+    query_np = np.array([query_embedding]).astype('float32')
+    
+    distances, indices = index.search(query_np, k=top_k)
+    
+    all_texts = list_documents()
+    results = [all_texts[i] for i in indices[0] if i < len(all_texts)]
+    return results
 
-def add_message_to_context(message, metadata):
+def add_message_to_context(message):
     embeddings = generate_embeddings([message])
-    store_embeddings([message], embeddings, [metadata])
+    store_embeddings([message])
