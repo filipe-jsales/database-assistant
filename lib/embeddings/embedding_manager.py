@@ -26,9 +26,11 @@ def generate_embeddings(texts, model="llama3"):
     return response.json().get("embeddings", [])
 
 def list_documents():
+    print('list documents')
     if os.path.exists(context_file_path):
         with open(context_file_path, 'r') as file:
             lines = file.readlines()
+            print('lines:', lines)
         return [line.strip() for line in lines]
     else:
         return []
@@ -61,6 +63,7 @@ def get_relevant_context(query_embedding, top_k=5):
     
     all_texts = list_documents()
     results = [all_texts[i] for i in indices[0] if i < len(all_texts)]
+    print('results:', results)
     return results
 
 def add_message_to_context(message):

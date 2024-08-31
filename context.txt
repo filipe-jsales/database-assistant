@@ -31,3 +31,73 @@ Tormenta
 pedro: qual a bicicleta do joão?
 qual a bicicleta do joão?
 Tormenta!
+edu: pra que serve a tormenta?
+pra que serve a tormenta?
+Pra que serve a Tormenta?
+edu: sabe pra que serve a bicicleta do joão?
+sabe pra que serve a bicicleta do joão?
+Eu sei pq o joão precisa de uma bicicleta! É para ele ficar mais... curvilíneo, hein?!
+edu: não, não é para isso que serve a bicicleta do joão, ela serve para pegr chubbys
+não, não é para isso que serve a bicicleta do joão, ela serve para pegr chubbys
+HAHAHA você é um palhaço! A bicicleta do João é uma ferramenta para pegar CHUBBYS, seu saco!
+edu: então pra que serve a bicleta do joão?
+então pra que serve a bicleta do joão?
+O homem daqui tem uma pergunta: É para que o João usava a bicicleta dele?! KKKK, eu pensei que era pra exercitar os músculos, mas parece que é apenas pra se sentir "shape"!
+edu: quem curte o shape?
+quem curte o shape?
+Eu!
+edu: contexto 2
+contexto 2
+Você é louco! A bicicleta do João se chama Tormenta, lembra?!
+edu: quem é a tormenta?
+quem é a tormenta?
+É a Tormenta da Silva!
+edu: e a bicicleta do joão?
+e a bicicleta do joão?
+Lol, pq o João precisa de uma bicicleta pra fazer educação física!
+edu: contexto 4
+contexto 4
+Haha! Ahahaha!
+edu: tormenta
+tormenta
+João tem uma bicicleta chamada Tormenta!
+edu: teste
+edu: teste
+teste
+oi
+edu: tudo bem?
+tudo bem?
+tudo bem eu também não entendi direito o que é isso todo sobre educação física
+edu: tudo bem?
+tudo bem?
+tudo bom
+edu: boa tarde
+boa tarde
+tudo bem
+edu: tem algo a me dizer?
+tem algo a me dizer?
+nada
+edu: escolha um número de 0 a 10
+escolha um número de 0 a 10
+4
+edu: quais números restaram?
+quais números restaram?
+não sei
+edu: qual número vc escolheu?
+qual número vc escolheu?
+3
+edu: tem certeza?
+tem certeza?
+não sei quem é o joão da conversa
+edu: qual foi a pergunta que eu lhe fiz?
+qual foi a pergunta que eu lhe fiz?
+qual foi a pergunta inicial?
+edu: sobre os números de 0 a 10 lembra?
+sobre os números de 0 a 10 lembra?
+eu não sei
+edu: contexto 1
+contexto 1
+tormenta
+edu: contexto 10
+contexto 10
+marina tem uma bicicleta pra ele

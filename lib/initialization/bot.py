@@ -33,15 +33,13 @@ def init(start_message, group_name, driver, engine, use_audio):
                     member_name = get_member_name_from_message(user_message)
                     context = member_contexts.get(member_name, "")
                     previous_context = sender_name + ": " + user_message
-                    print('previous context', previous_context)
-
+                    
                     add_message_to_context(previous_context)
                     list_documents()
                     user_message_embedding = generate_embeddings([user_message])[0]
                     relevant_contexts = get_relevant_context(user_message_embedding)
                     
                     full_prompt = '\n'.join(relevant_contexts) + f"\nMensagem do usuário: {context} {user_message}"
-                    print('full prompt:', full_prompt)
                     
                     response = get_api_response(full_prompt)
                     print(response)
@@ -51,7 +49,6 @@ def init(start_message, group_name, driver, engine, use_audio):
 
                     if use_audio:
                         choice = random.randint(1, 100)
-                        print("random: " + str(choice))
                         if choice <= 20:
                             record_and_send_audio(driver, engine, group_name, response)
                         else:
