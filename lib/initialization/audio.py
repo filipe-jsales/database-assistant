@@ -1,9 +1,13 @@
 import os
+try:
+    import pyttsx3
+    from rvc_python.infer import RVCInference
+    from pygame import mixer
+except ImportError:
+    print("Bibliotecas de áudio não instaladas.")
 
-import pyttsx3
+
 from dotenv import load_dotenv
-from pygame import mixer
-from rvc_python.infer import RVCInference
 
 load_dotenv()
 
