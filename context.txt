@@ -1,0 +1,12 @@
+Edu: o leo mora na rua 1
+rua 1
+Edu: o leo mora em qual rua?
+rua 1
+Edu: a bicicleta do joao se chama tormenta
+tormenta
+Edu: como se chama a bicicleta do joao?
+tormenta
+Edu: o sobrenome do pedro é frota
+frota
+Edu: como é o sobrenome do pedro?
+frota

@@ -7,7 +7,7 @@ load_dotenv()
 API_URL = os.getenv("API_URL")
 API_MODEL = os.getenv("API_MODEL")
 
-def get_api_response(input):
+def get_api_response(input, context):
     headers = {"Content-Type": "application/json"}
 
     with open('instructions.txt', 'r', encoding='utf-8') as file:
@@ -16,7 +16,7 @@ def get_api_response(input):
     formatted_instructions = f"""
     <s>[INST] {instructions} [/INST]</s>
     [INST] {input}
-           Contexto: Você faz parte de um grupo de whatsapp que contém joão, pedro, ulisses, leo, filipe, marina, lua
+           Contexto: {context}
            Resposta:
     [/INST]
     """

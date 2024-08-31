@@ -52,7 +52,7 @@ def init(start_message, group_name, rvc, driver, engine, use_audio, response_pre
 
                 elif any(bot_word in last_message.lower() for bot_word in bot_words):
                     prompt = "me diga que você não é um bot, de forma rude e usando palavrão em 1/5 das vezes"
-                    response = get_api_response(prompt)
+                    response = get_api_response(prompt, "")
                     send_message_to_group(driver, group_name, response)
 
                 elif last_message.startswith("!audio") and use_audio:
@@ -78,7 +78,7 @@ def handle_audio_command(driver, engine, group_members, group_name, last_message
 
     full_prompt = f"\nMensagem do usuário: {context} {user_message}"
 
-    response = get_api_response(full_prompt)
+    response = get_api_response(full_prompt, context)
     print('response full prompt:', response)
 
     add_message_to_context(response)
@@ -98,12 +98,13 @@ def handle_duta_command(driver, engine, group_members, group_name, last_message,
 
     add_message_to_context(previous_context)
     list_documents()
-    # user_message_embedding = generate_embeddings([user_message])[0]
-    # relevant_contexts = get_relevant_context(user_message_embedding)
+    user_message_embedding = generate_embeddings([user_message])[0]
+    relevant_contexts = get_relevant_context(user_message_embedding)
 
-    full_prompt = f"\nMensagem do usuário: {context} {user_message}"
+    combined_context = " ".join(relevant_contexts)
+    full_prompt = f"\nMensagem do usuário: {user_message}"
 
-    response = get_api_response(full_prompt)
+    response = get_api_response(full_prompt, combined_context)
     print('response full prompt:', response)
 
     add_message_to_context(response)
