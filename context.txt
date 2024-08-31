@@ -10,3 +10,17 @@ Edu: o sobrenome do pedro é frota
 frota
 Edu: como é o sobrenome do pedro?
 frota
+Pedro V: pedro é amigo do joao
+frota
+Pedro V: qual o sobrenome do amigo da pessoa que tem a  bicicleta chamada tormenta?
+frota
+Pedro V: qual o nome do veiculo que o amigo do pedro tem?
+tormenta
+Pedro V: joao é amigo do leo
+frota tormenta
+Pedro V: leo é amigo de quantos graus do pedro
+3 graus
+João Marcelo: qual o nome completo do João?
+joão marcelo
+Pedro V: como você recomenda que pedro vá para casa do leo, levando em consideração que o pedro mora do lado do joao
+percorra pela rua do leo

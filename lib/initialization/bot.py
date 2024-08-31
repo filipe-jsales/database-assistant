@@ -104,6 +104,8 @@ def handle_duta_command(driver, engine, group_members, group_name, last_message,
     combined_context = " ".join(relevant_contexts)
     full_prompt = f"\nMensagem do usuário: {user_message}"
 
+    # FIXME: combined context will break the model line limit sometime, create a 
+    # function to get only the most similar context
     response = get_api_response(full_prompt, combined_context)
     print('response full prompt:', response)
 
