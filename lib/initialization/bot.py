@@ -12,15 +12,15 @@ from lib.interaction.message import extract_message_text, extract_sender, get_me
 
 message_history = []
 pegar_mensagem_random = False
-from ..embeddings.embedding_manager import store_embeddings, generate_embeddings, list_documents, get_relevant_context, add_message_to_context
+from lib.embeddings.embedding_manager import generate_embeddings, list_documents, get_relevant_context, add_message_to_context
 
-def my_function():
+def set_read_recent_message():
     global pegar_mensagem_random
     pegar_mensagem_random = True
 
 def init(start_message, group_name, rvc, driver, engine, use_audio, response_prefix=""):
     global pegar_mensagem_random
-    schedule.every(2).hours.do(my_function)
+    schedule.every(2).hours.do(set_read_recent_message)
     schedule.run_pending()
     if len(response_prefix) > 0:
         response_prefix += " "
@@ -30,6 +30,17 @@ def init(start_message, group_name, rvc, driver, engine, use_audio, response_pre
     search_box = driver.find_element(By.XPATH, '//div[@contenteditable="true"][@data-tab="3"]')
     search_box.send_keys(group_name + Keys.ENTER)
     search_box.clear()
+
+    element = driver.find_element(By.XPATH, "//div[@id='main']//header//div[@role='button']")
+    element.click()
+    members_div = driver.find_element(By.XPATH, "//div[@aria-label[contains(., 'Lista de membros')]]")
+    span_elements = members_div.find_elements(By.XPATH, ".//div[@role='gridcell']//span[@title]")
+    group_members = [span.get_attribute("title") for span in span_elements]
+    group_members.remove('Você')
+
+    exit_button = driver.find_element(By.XPATH, "//div[@role='button' and @aria-label='Fechar']")
+    exit_button.click()
+
     while True:
         schedule.run_pending()
         try:
@@ -37,6 +48,11 @@ def init(start_message, group_name, rvc, driver, engine, use_audio, response_pre
             last_message_element = messages[-1]
             last_message = extract_message_text(last_message_element)
             sender_name = extract_sender(last_message_element)
+            deduct = 2
+            while sender_name is None:
+                next_message_index = len(messages) - deduct
+                deduct+=1
+                sender_name = extract_sender(messages[next_message_index])
 
             if pegar_mensagem_random or (last_message != last_message_text and last_message.strip()):
                 print(f"Última mensagem: {sender_name} - {last_message}")
@@ -45,35 +61,10 @@ def init(start_message, group_name, rvc, driver, engine, use_audio, response_pre
                 if last_message.startswith("!duta") or pegar_mensagem_random:
                     pegar_mensagem_random = False
                     user_message = last_message.replace("!duta", "").strip()
-                    member_name = get_member_name_from_message(user_message)
+                    member_name = get_member_name_from_message(user_message, group_members)
                     context = member_contexts.get(member_name, "")
                     previous_context = sender_name + ": " + user_message
                     print('previous context', previous_context)
-
-                    if user_message:
-                        full_prompt = ''
-                        # TODO: append de todo o histórico de mensagems
-                        for message in message_history:
-                            full_prompt += " Leve em consideração que uma das mensagens anteriores foi: " + message
-                        full_prompt += f"Pergunta: {context} {user_message}"
-                        response = get_api_response(full_prompt)
-                        print(response)
-                        # TODO: melhorar histórico de mensagems
-                        message_history.append(user_message)
-                        if len(message_history) > 15:
-                            message_history.pop(0)
-                        message_history.append(response)
-                        if len(message_history) > 15:
-                            message_history.pop(0)
-                        if use_audio:
-                            choice = random.randint(1, 100)
-                            print("random: " + str(choice))
-                            if choice <= 20:
-                                record_and_send_audio(rvc, driver, engine, group_name, response_prefix + response)
-                            else:
-                                send_message_to_group(driver, group_name, response_prefix + response)
-                        else:
-                            send_message_to_group(driver, group_name, response_prefix + response)
                     add_message_to_context(previous_context)
                     list_documents()
                     user_message_embedding = generate_embeddings([user_message])[0]
@@ -87,16 +78,16 @@ def init(start_message, group_name, rvc, driver, engine, use_audio, response_pre
 
                     add_message_to_context(user_message)
                     add_message_to_context(response)
-
-                    if use_audio:
-                        choice = random.randint(1, 100)
-                        print("random: " + str(choice))
-                        if choice <= 20:
-                            record_and_send_audio(driver, engine, group_name, response)
+                    if user_message:
+                        if use_audio:
+                            choice = random.randint(1, 100)
+                            print("random: " + str(choice))
+                            if choice <= 20:
+                                record_and_send_audio(rvc, driver, engine, group_name, response_prefix + response)
+                            else:
+                                send_message_to_group(driver, group_name, response_prefix + response)
                         else:
-                            send_message_to_group(driver, group_name, response)
-                    else:
-                        send_message_to_group(driver, group_name, response)
+                            send_message_to_group(driver, group_name, response_prefix + response)
 
                 elif last_message.startswith("!everyone"):
                     send_mentions_one_by_one(driver, group_name)
@@ -114,21 +105,22 @@ def init(start_message, group_name, rvc, driver, engine, use_audio, response_pre
 
                     member_name = get_member_name_from_message(user_message)
                     context = member_contexts.get(member_name, "")
+                    previous_context = sender_name + ": " + user_message
+                    print('previous context', previous_context)
+                    add_message_to_context(previous_context)
+                    list_documents()
+                    user_message_embedding = generate_embeddings([user_message])[0]
+                    relevant_contexts = get_relevant_context(user_message_embedding)
+
+                    full_prompt = '\n'.join(relevant_contexts) + f"\nMensagem do usuário: {context} {user_message}"
+                    print('full prompt:', full_prompt)
+
+                    response = get_api_response(full_prompt)
+                    print(response)
+
+                    add_message_to_context(user_message)
+                    add_message_to_context(response)
                     if user_message:
-                        full_prompt = ''
-                        # TODO: append de todo o histórico de mensagems
-                        for message in message_history:
-                            full_prompt += " Leve em consideração que uma das mensagens anteriores foi: " + message
-                        full_prompt += f"Pergunta: {context} {user_message}"
-                        response = get_api_response(full_prompt)
-                        print(response)
-                        # TODO: melhorar histórico de mensagems
-                        message_history.append(user_message)
-                        if len(message_history) > 15:
-                            message_history.pop(0)
-                        message_history.append(response)
-                        if len(message_history) > 15:
-                            message_history.pop(0)
                         record_and_send_audio(rvc, driver, engine, group_name, response_prefix+response)
 
         except Exception as e:
