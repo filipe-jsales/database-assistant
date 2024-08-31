@@ -23,11 +23,7 @@ def send_mentions_one_by_one(driver, group_name, group_members):
 
     time.sleep(2)
     for member in group_members:
-        normalized_string = unicodedata.normalize('NFD', member)
-        # Filter out the combining characters (diacritical marks)
-        string_without_accents = ''.join(
-            char for char in normalized_string if unicodedata.category(char) != 'Mn'
-        )
+        string_without_accents = get_without_accetuation(member)
         message_box = driver.find_element(By.XPATH, '//div[@contenteditable="true"][@data-tab="10"]')
         message_box.clear()
         message_box.send_keys('@' + string_without_accents + Keys.ENTER)
@@ -53,3 +49,10 @@ def get_member_name_from_message(message, group_members):
         if member.lower() in message.lower():
             return member
     return None
+
+def get_without_accetuation(member):
+    normalized_string = unicodedata.normalize('NFD', member)
+    string_without_accents = ''.join(
+        char for char in normalized_string if unicodedata.category(char) != 'Mn'
+    )
+    return string_without_accents

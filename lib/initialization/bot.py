@@ -64,28 +64,6 @@ def init(start_message, group_name, rvc, driver, engine, use_audio, response_pre
         time.sleep(5)
 
 
-def handle_audio_command(driver, engine, group_members, group_name, last_message, response_prefix, rvc, sender_name):
-    user_message = last_message.replace("!audio", "").strip()
-    member_name = get_member_name_from_message(user_message, group_members)
-    context = member_contexts.get(member_name, "")
-    previous_context = sender_name + ": " + user_message
-    print('previous context', previous_context)
-
-    add_message_to_context(previous_context)
-    list_documents()
-    # user_message_embedding = generate_embeddings([user_message])[0]
-    # relevant_contexts = get_relevant_context(user_message_embedding)
-
-    full_prompt = f"\nMensagem do usuário: {context} {user_message}"
-
-    response = get_api_response(full_prompt, context)
-    print('response full prompt:', response)
-
-    add_message_to_context(response)
-    if user_message:
-        record_and_send_audio(rvc, driver, engine, group_name, response_prefix + response)
-
-
 def handle_duta_command(driver, engine, group_members, group_name, last_message, response_prefix, rvc, sender_name,
                         use_audio):
     global pegar_mensagem_random
@@ -121,6 +99,29 @@ def handle_duta_command(driver, engine, group_members, group_name, last_message,
         else:
             send_message_to_group(driver, group_name, response_prefix + response)
 
+def handle_audio_command(driver, engine, group_members, group_name, last_message, response_prefix, rvc, sender_name):
+    user_message = last_message.replace("!audio", "").strip()
+    member_name = get_member_name_from_message(user_message, group_members)
+    context = member_contexts.get(member_name, "")
+    previous_context = sender_name + ": " + user_message
+    print('previous context', previous_context)
+
+    add_message_to_context(previous_context)
+    list_documents()
+    user_message_embedding = generate_embeddings([user_message])[0]
+    relevant_contexts = get_relevant_context(user_message_embedding)
+
+    combined_context = " ".join(relevant_contexts)
+    full_prompt = f"\nMensagem do usuário: {user_message}"
+
+    # FIXME: combined context will break the model line limit sometime, create a
+    # function to get only the most similar context
+    response = get_api_response(full_prompt, combined_context)
+    print('response full prompt:', response)
+
+    add_message_to_context(response)
+    if user_message:
+        record_and_send_audio(rvc, driver, engine, group_name, response_prefix + response)
 
 def set_read_recent_message():
     global pegar_mensagem_random
