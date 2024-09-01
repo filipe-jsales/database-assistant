@@ -97,7 +97,7 @@ def handle_duta_command(driver, engine, group_members, group_name, last_message,
     response = get_api_response(full_prompt, combined_context)
     print('response full prompt:', response)
 
-    add_message_to_context(response)
+    add_message_to_context('Duta: ' + response)
     if user_message:
         if use_audio:
             choice = random.randint(1, 100)
@@ -129,7 +129,7 @@ def handle_audio_command(driver, engine, group_members, group_name, last_message
     response = get_api_response(full_prompt, combined_context)
     print('response full prompt:', response)
 
-    add_message_to_context(response)
+    add_message_to_context('Duta: ' + response)
     if user_message:
         record_and_send_audio(rvc, driver, engine, group_name, response_prefix + response)
 

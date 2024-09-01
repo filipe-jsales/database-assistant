@@ -12,6 +12,30 @@ index = faiss.IndexFlatL2(embedding_dimension)
 
 context_file_path = 'context.txt'
 
+def clean_duplicates(file_path):
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            lines = file.readlines()
+    except UnicodeDecodeError:
+        with open(file_path, 'r', encoding='iso-8859-1') as file:
+            lines = file.readlines()
+
+    unique_lines = set()
+    cleaned_lines = []
+
+    for line in lines:
+        if line.startswith(('!', 'k', 'K')):
+            continue
+
+        if line not in unique_lines:
+            cleaned_lines.append(line)
+            unique_lines.add(line)
+    
+    with open(file_path, 'w', encoding='utf-8') as file:
+        file.writelines(cleaned_lines)
+
+    print(f"Cleanup completed. {len(lines) - len(cleaned_lines)} duplicates removed.")
+
 def generate_embeddings(texts, model="llama3"):
     url = os.getenv("API_EMBEDDING_URL", "https://ollama.chargedcloud.com.br/api/embed")
     data = {
@@ -36,6 +60,7 @@ def list_documents():
         return []
 
 def store_embeddings(texts):
+    clean_duplicates(context_file_path)
     embeddings = generate_embeddings(texts)
 
     ids = [str(uuid.uuid4()) for _ in range(len(embeddings))]
@@ -46,11 +71,11 @@ def store_embeddings(texts):
     embeddings_np = np.array(embeddings).astype('float32')
     index.add(embeddings_np)
 
-    with open(context_file_path, 'a') as file:
+    with open(context_file_path, 'a', encoding='utf-8') as file:
         for text in texts:
             file.write(text + '\n')
 
-def get_relevant_context(query_embedding, top_k=10):
+def get_relevant_context(query_embedding, top_k=5):
     query_np = np.array([query_embedding]).astype('float32')
     
     distances, indices = index.search(query_np, k=top_k)
