@@ -15,6 +15,9 @@ message_history = []
 pegar_mensagem_random = False
 from lib.embeddings.embedding_manager import generate_embeddings, list_documents, get_relevant_context, add_message_to_context
 
+def should_respond_randomly():
+    return random.randint(1, 100) <= 13
+
 def init(start_message, group_name, rvc, driver, engine, use_audio, response_prefix=""):
     global pegar_mensagem_random
     global message_history
@@ -43,8 +46,12 @@ def init(start_message, group_name, rvc, driver, engine, use_audio, response_pre
             add_message_to_context(previous_context)
 
 
-            if pegar_mensagem_random or (last_message != last_message_text and last_message.strip()):
+            if (pegar_mensagem_random or last_message.endswith("?") or 
+                (last_message != last_message_text and last_message.strip())):
                 print(f"Última mensagem: {sender_name} - {last_message}")
+                if should_respond_randomly():
+                    print(f"Respondendo aleatoriamente à mensagem: {sender_name} - {last_message}")
+                    handle_duta_command(driver, engine, group_members, group_name, last_message, response_prefix, rvc, sender_name, use_audio)
                 last_message_text = last_message
 
                 if last_message.startswith("!duta") or pegar_mensagem_random:

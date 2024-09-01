@@ -24,7 +24,7 @@ def clean_duplicates(file_path):
     cleaned_lines = []
 
     for line in lines:
-        if line.startswith(('!', 'k', 'K')):
+        if line.startswith(('!', 'k', 'K', '0', '1', '2')):
             continue
 
         if line not in unique_lines:
@@ -75,7 +75,7 @@ def store_embeddings(texts):
         for text in texts:
             file.write(text + '\n')
 
-def get_relevant_context(query_embedding, top_k=5):
+def get_relevant_context(query_embedding, top_k=10):
     query_np = np.array([query_embedding]).astype('float32')
     
     distances, indices = index.search(query_np, k=top_k)
