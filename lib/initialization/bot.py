@@ -47,12 +47,15 @@ def listen(driver, engine, group_members, group_name, response_prefix, rvc,
         last_message = extract_message_text(last_message_element)
         sender_name = get_sender(messages, last_message_element, group_members)
 
-        if (pegar_mensagem_random or (last_message.endswith("?") and last_message != last_message_text) or
-                (last_message != last_message_text and last_message.strip())):
+        if pegar_mensagem_random or (last_message != last_message_text and last_message.strip()):
             print(f"Última mensagem: {sender_name} - {last_message}")
             last_message_text = last_message
             if should_respond_randomly():
                 print(f"Respondendo aleatoriamente à mensagem: {sender_name} - {last_message}")
+                handle_duta_command(driver, engine, group_members, group_name, last_message, response_prefix, rvc,
+                                    sender_name, use_audio)
+
+            if last_message.endswith("?"):
                 handle_duta_command(driver, engine, group_members, group_name, last_message, response_prefix, rvc,
                                     sender_name, use_audio)
 
