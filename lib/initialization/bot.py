@@ -49,10 +49,11 @@ def init(start_message, group_name, rvc, driver, engine, use_audio, response_pre
             if (pegar_mensagem_random or last_message.endswith("?") or 
                 (last_message != last_message_text and last_message.strip())):
                 print(f"Última mensagem: {sender_name} - {last_message}")
+                
+                last_message_text = last_message
                 if should_respond_randomly():
                     print(f"Respondendo aleatoriamente à mensagem: {sender_name} - {last_message}")
                     handle_duta_command(driver, engine, group_members, group_name, last_message, response_prefix, rvc, sender_name, use_audio)
-                last_message_text = last_message
 
                 if last_message.startswith("!duta") or pegar_mensagem_random:
                     handle_duta_command(driver, engine, group_members, group_name, last_message, response_prefix, rvc,
