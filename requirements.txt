@@ -1,5 +1,5 @@
-numpy
-faiss-cpu
+numpy~=1.23.5
+faiss-cpu~=1.7.3
 selenium==4.8.0
 webdriver-manager==4.0.2
 requests==2.31.0

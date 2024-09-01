@@ -5,6 +5,7 @@ import schedule
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from lib.ai import get_api_response
+from lib.image import create_fryed_stamp
 from lib.interaction.audio import record_and_send_audio
 from context import member_contexts, banned_words, bot_words, pingar_todos
 from lib.interaction.message import extract_message_text, extract_sender, get_member_name_from_message, \
@@ -36,6 +37,12 @@ def init(start_message, group_name, rvc, driver, engine, use_audio, response_pre
             last_message = extract_message_text(last_message_element)
             sender_name = get_sender(messages, last_message_element, group_members)
 
+            previous_context = sender_name + ": " + last_message
+            print('previous context', previous_context)
+
+            add_message_to_context(previous_context)
+
+
             if pegar_mensagem_random or (last_message != last_message_text and last_message.strip()):
                 print(f"Última mensagem: {sender_name} - {last_message}")
                 last_message_text = last_message
@@ -58,6 +65,9 @@ def init(start_message, group_name, rvc, driver, engine, use_audio, response_pre
                 elif last_message.startswith("!audio") and use_audio:
                     handle_audio_command(driver, engine, group_members, group_name, last_message, response_prefix, rvc,
                                          sender_name)
+                elif last_message.startswith("!fry"):
+                    image_element = last_message_element.find_element(By.XPATH, ".//img[contains(@alt, '!fry')]")
+                    create_fryed_stamp(driver, image_element)
 
         except Exception as e:
             print(f"Erro: {str(e)}")
