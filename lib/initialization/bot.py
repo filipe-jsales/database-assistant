@@ -13,6 +13,7 @@ from lib.interaction.message import extract_message_text, extract_sender, get_me
 
 message_history = []
 pegar_mensagem_random = False
+last_message_text = ""
 from lib.embeddings.embedding_manager import generate_embeddings, list_documents, get_relevant_context, add_message_to_context
 
 def should_respond_randomly():
@@ -30,55 +31,55 @@ def init(start_message, group_name, rvc, driver, engine, use_audio, response_pre
     focus_on_group(driver, group_name)
 
     group_members = get_member_list(driver)
-    last_message_text = ""
 
+    schedule.every(1).seconds.do(listen, driver, engine, group_members, group_name, response_prefix, rvc, use_audio)
     while True:
         schedule.run_pending()
-        try:
-            messages = driver.find_elements(By.XPATH, '//div[contains(@class, "message-in")]')
-            last_message_element = messages[-1]
-            last_message = extract_message_text(last_message_element)
-            sender_name = get_sender(messages, last_message_element, group_members)
-
-            previous_context = sender_name + ": " + last_message
-            print('previous context', previous_context)
-
-            add_message_to_context(previous_context)
 
 
-            if (pegar_mensagem_random or last_message.endswith("?") or 
+def listen(driver, engine, group_members, group_name, response_prefix, rvc,
+           use_audio):
+    global pegar_mensagem_random
+    global last_message_text
+    try:
+        messages = driver.find_elements(By.XPATH, '//div[contains(@class, "message-in")]')
+        last_message_element = messages[-1]
+        last_message = extract_message_text(last_message_element)
+        sender_name = get_sender(messages, last_message_element, group_members)
+
+        if (pegar_mensagem_random or (last_message.endswith("?") and last_message != last_message_text) or
                 (last_message != last_message_text and last_message.strip())):
-                print(f"Última mensagem: {sender_name} - {last_message}")
-                if should_respond_randomly():
-                    print(f"Respondendo aleatoriamente à mensagem: {sender_name} - {last_message}")
-                    handle_duta_command(driver, engine, group_members, group_name, last_message, response_prefix, rvc, sender_name, use_audio)
-                last_message_text = last_message
+            print(f"Última mensagem: {sender_name} - {last_message}")
+            last_message_text = last_message
+            if should_respond_randomly():
+                print(f"Respondendo aleatoriamente à mensagem: {sender_name} - {last_message}")
+                handle_duta_command(driver, engine, group_members, group_name, last_message, response_prefix, rvc,
+                                    sender_name, use_audio)
 
-                if last_message.startswith("!duta") or pegar_mensagem_random:
-                    handle_duta_command(driver, engine, group_members, group_name, last_message, response_prefix, rvc,
-                                        sender_name, use_audio)
+            if last_message.startswith("!duta") or pegar_mensagem_random:
+                handle_duta_command(driver, engine, group_members, group_name, last_message, response_prefix, rvc,
+                                    sender_name, use_audio)
 
-                elif last_message.startswith("!everyone"):
-                    send_mentions_one_by_one(driver, group_name, group_members)
+            elif last_message.startswith("!everyone"):
+                send_mentions_one_by_one(driver, group_name, group_members)
 
-                elif any(banned_word in last_message.lower() for banned_word in banned_words):
-                    send_message_to_group(driver, group_name, "opa irmão, sem palavrão aí paizão, grupo da família aqui")
+            elif any(banned_word in last_message.lower() for banned_word in banned_words):
+                send_message_to_group(driver, group_name, "opa irmão, sem palavrão aí paizão, grupo da família aqui")
 
-                elif any(bot_word in last_message.lower() for bot_word in bot_words):
-                    prompt = "me diga que você não é um bot, de forma rude e usando palavrão em 1/5 das vezes"
-                    response = get_api_response(prompt, "")
-                    send_message_to_group(driver, group_name, response)
+            elif any(bot_word in last_message.lower() for bot_word in bot_words):
+                prompt = "me diga que você não é um bot, de forma rude e usando palavrão em 1/5 das vezes"
+                response = get_api_response(prompt, "")
+                send_message_to_group(driver, group_name, response)
 
-                elif last_message.startswith("!audio") and use_audio:
-                    handle_audio_command(driver, engine, group_members, group_name, last_message, response_prefix, rvc,
-                                         sender_name)
-                elif last_message.startswith("!fry"):
-                    image_element = last_message_element.find_element(By.XPATH, ".//img[contains(@alt, '!fry')]")
-                    create_fryed_stamp(driver, image_element)
+            elif last_message.startswith("!audio") and use_audio:
+                handle_audio_command(driver, engine, group_members, group_name, last_message, response_prefix, rvc,
+                                     sender_name)
+            elif last_message.startswith("!fry"):
+                image_element = last_message_element.find_element(By.XPATH, ".//img[contains(@alt, '!fry')]")
+                create_fryed_stamp(driver, image_element)
 
-        except Exception as e:
-            print(f"Erro: {str(e)}")
-        time.sleep(5)
+    except Exception as e:
+        print(f"Erro: {str(e)}")
 
 
 def handle_duta_command(driver, engine, group_members, group_name, last_message, response_prefix, rvc, sender_name,
