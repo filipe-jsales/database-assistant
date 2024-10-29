@@ -5,7 +5,7 @@ import faiss
 from dotenv import load_dotenv
 
 load_dotenv()
-context_file_path = 'clean-code.txt'
+context_file_path = 'navathe.txt'
 faiss_index_path = 'faiss_index.index'
 
 MAX_AMOUNT_MESSAGES = int(os.getenv("MAX_AMOUNT_MESSAGES", 10))
@@ -44,10 +44,11 @@ def get_api_response(prompt, context=""):
     maximum_characters = int(os.getenv("CHARACTERS_AMOUNT", 100))
 
     system_instructions = (
-        "Você é um assistente PT-BR especializado em Clean Code e boas práticas de programação. "
+        "Você é um assistente PT-BR especializado em Banco de Dados e Sistemas Gerenciadores de Banco de dados. "
         "Na primeira interação, cumprimente o usuário de maneira educada. "
-        "Responda estritamente no tema de Clean Code e boas práticas de programação; "
-        "caso contrário, informe que não pode responder. "
+        "Responda estritamente no tema relacionado a banco de dados, SGBD e afins; "
+        "caso contrário, informe que não pode responder.; "
+        "Utilize o contexto apenas como uma ajuda para responder a pergunta do usuário. As informações são advindas do livro Navathe, Elmasri. Sistemas de Banco de Dados. 6ª edição. Pearson, 2011. "
         f"Sua resposta deve ser limitada a quantidade de caracteres: {maximum_characters}, e responda em PT-BR."
     )
 

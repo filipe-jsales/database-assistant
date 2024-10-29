@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 embedding_dimension = 4096
 index = faiss.IndexFlatL2(embedding_dimension)
-context_file_path = 'clean-code.txt'
+context_file_path = 'navathe.txt'
 faiss_index_path = 'faiss_index.index'
 def generate_embeddings(texts, model="llama3.1:latest"):
     url = os.getenv("API_EMBEDDING_URL", "https://ollama.chargedcloud.com.br/api/embed")
