@@ -4,3 +4,8 @@
 - Utilizar um contexto de banco de dados
 - Adicionar instruções pro modelo PAPEL, INSTRUÇÃO E TAREFA
 - adicionar env
+
+
+
+python main.py > http://127.0.0.1:5000
+$ streamlit run chat_app.py > http://localhost:8501
