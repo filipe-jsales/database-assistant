@@ -10,7 +10,7 @@ if "history" not in st.session_state:
 user_input = st.text_input("Você:", "")
 
 if user_input:
-    response = requests.post("https://c57f-2804-4df4-8000-6560-78fa-370e-1ecd-23cd.ngrok-free.app/chat", json={"input": user_input}).json()
+    response = requests.post("http://localhost:5000/chat", json={"input": user_input}).json()
     assistant_response = response.get("response", "Erro ao conectar com a API.")
 
     st.session_state["history"].append({"user": user_input, "assistant": assistant_response})

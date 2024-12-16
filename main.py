@@ -16,8 +16,8 @@ index = faiss.read_index(faiss_index_path)
 
 message_history = []
 
-def generate_embedding(text, model="llama3"):
-    url = os.getenv("API_EMBEDDING_URL", "https://ollama.chargedcloud.com.br/api/embed")
+def generate_embedding(text, model="llama3.1:latest"):
+    url = os.getenv("API_EMBEDDING_URL", "http://localhost:11434/api/embed")
     data = {"model": model, "input": [text]}
     response = requests.post(url, json=data)
     response.raise_for_status()
@@ -52,7 +52,7 @@ def get_api_response(prompt, context=""):
 
     headers = {"Content-Type": "application/json"}
     data = {"model": "llama3.1:latest", "prompt": full_prompt, "stream": False}
-    url = os.getenv("API_COMPLETION_URL", "https://ollama.chargedcloud.com.br/api/generate")
+    url = os.getenv("API_COMPLETION_URL", "http://localhost:11434/api/generate")
     response = requests.post(url, json=data, headers=headers)
     response_data = response.json()
     
@@ -67,9 +67,19 @@ def get_api_response(prompt, context=""):
 @app.route('/chat', methods=['POST'])
 def chat():
     user_input = request.json.get('input')
-    context = get_relevant_context(user_input)
-    response = get_api_response(user_input, context)
-    return jsonify({"response": response})
+    if not user_input:
+        return jsonify({"error": "Input is required"}), 400
+
+    try:
+        context = get_relevant_context(user_input)
+        print("Context Generated:", context)  # Debug
+        response = get_api_response(user_input, context)
+        print("Response from API:", response)  # Debug
+        return jsonify({"response": response})
+    except Exception as e:
+        print("Error in /chat endpoint:", e)  # Debug
+        return jsonify({"error": str(e)}), 500
+
 
 if __name__ == "__main__":
     app.run(port=5000)

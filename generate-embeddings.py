@@ -10,7 +10,7 @@ index = faiss.IndexFlatL2(embedding_dimension)
 context_file_path = 'navathe.txt'
 faiss_index_path = 'faiss_index.index'
 def generate_embeddings(texts, model="llama3.1:latest"):
-    url = os.getenv("API_EMBEDDING_URL", "https://ollama.chargedcloud.com.br/api/embed")
+    url = os.getenv("API_EMBEDDING_URL", "http://localhost:11434/api/embed")
     data = {
         "model": model,
         "input": texts
